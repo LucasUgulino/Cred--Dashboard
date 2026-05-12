@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cred-green-dark: #4A5D23;
+  --color-cred-green-medium: #6B7234;
+  --color-cred-green-light: #8B956D;
+  --color-cred-orange: #D97706;
+  --color-cred-orange-light: #F59E0B;
+  --color-cred-cream: #FDFBF7;
+  --color-cred-beige: #F5F1E8;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-cred-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utilitários personalizados */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
