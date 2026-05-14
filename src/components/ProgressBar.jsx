@@ -3,8 +3,8 @@ function ProgressBar({ label, value, colorScheme = 'green' }) {
     return (
         <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">{label}</span>
-                <span className="text-sm font-semibold text-gray-900">{value}%</span>
+                <span className="text-sm font-medium text-white">{label}</span>
+                <span className="text-sm font-semibold text-white">{value}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div

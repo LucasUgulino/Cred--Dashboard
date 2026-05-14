@@ -12,7 +12,7 @@ export default function Dashboard() {
     // Estados dos filtros
     const [busca, setBusca] = useState('');
     const [scoreMin, setScoreMin] = useState('');
-    const [ordenarPor, setOrdenarPor] = useState('progresso'); // 'progresso' ou 'score'
+    const [ordenarPor, setOrdenarPor] = useState('validacao'); // 'validacao' ou 'score'
 
     // Filtragem e ordenação automática (useMemo evita cálculos desnecessários)
     const safrasFiltradas = useMemo(() => {
@@ -22,7 +22,9 @@ export default function Dashboard() {
             const termo = busca.toLowerCase();
             resultado = resultado.filter(s =>
                 s.produtor.toLowerCase().includes(termo) ||
-                s.safra.toLowerCase().includes(termo)
+                s.safra.toLowerCase().includes(termo) ||
+                s.associacao.toLowerCase().includes(termo) ||
+                s.regiao.toLowerCase().includes(termo)
             );
         }
 
@@ -31,7 +33,7 @@ export default function Dashboard() {
         }
 
         resultado.sort((a, b) => {
-            return ordenarPor === 'score' ? b.agroScore - a.agroScore : b.progresso - a.progresso;
+            return ordenarPor === 'score' ? b.agroScore - a.agroScore : b.validacaoEsg - a.validacaoEsg;
         });
 
         return resultado;
@@ -61,9 +63,9 @@ export default function Dashboard() {
                     <ProgressBar label="Certificações" value={indicadoresSustentabilidade.certificacoes} colorScheme="orange" />
 
                     <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
-                        <div className="text-center"><p className="text-2xl font-bold text-cred-orange">{indicadoresSustentabilidade.culturasOrganicas}</p><p className="text-xs opacity-75 mt-1">Culturas Orgânicas</p></div>
-                        <div className="text-center"><p className="text-2xl font-bold text-cred-orange">{indicadoresSustentabilidade.praticasRegenerativas}</p><p className="text-xs opacity-75 mt-1">Práticas Regenerativas</p></div>
-                        <div className="text-center"><p className="text-2xl font-bold text-cred-orange">{indicadoresSustentabilidade.usoEficienteAgua}%</p><p className="text-xs opacity-75 mt-1">Uso Eficiente de Água</p></div>
+                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.culturasOrganicas}</p><p className="text-xs opacity-75 mt-1">Culturas Orgânicas</p></div>
+                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.praticasRegenerativas}</p><p className="text-xs opacity-75 mt-1">Práticas Regenerativas</p></div>
+                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.usoEficienteAgua}%</p><p className="text-xs opacity-75 mt-1">Uso Eficiente de Água</p></div>
                     </div>
                 </div>
             </section>
@@ -103,7 +105,7 @@ export default function Dashboard() {
                             onChange={(e) => setOrdenarPor(e.target.value)}
                             className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cred-orange/50 bg-white"
                         >
-                            <option value="progresso">Ordenar: Progresso</option>
+                            <option value="validação">Ordenar: Validação ESG</option>
                             <option value="score">Ordenar: AgroScore</option>
                         </select>
                     </div>
