@@ -93,8 +93,20 @@ export default function Login() {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-xs text-gray-400">
-                    <p>Protótipo: use qualquer e-mail e senha (mín. 4 caracteres)</p>
+                <div className="mt-5 space-y-2 text-center text-sm">
+                    <a href="#" className="block text-cred-green-medium hover:underline">
+                        Esqueci minha senha
+                    </a>
+                    <p className="text-gray-400">
+                        Sem conta?{' '}
+                        <a href="#" className="text-cred-green-dark font-medium hover:underline">
+                            Cadastrar minha empresa
+                        </a>
+                    </p>
+                </div>
+
+                <div className="mt-4 text-center text-xs text-gray-400">
+                    Protótipo: use qualquer e-mail e senha (mín. 4 caracteres)
                 </div>
             </div>
         </div>

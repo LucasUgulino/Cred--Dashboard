@@ -1,136 +1,124 @@
-import { useState, useMemo } from 'react';
-import { Leaf, MapPin, Users, Plus, Search, SlidersHorizontal } from 'lucide-react';
+import { Leaf, MapPin, Star } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
+} from 'recharts';
 import MetricCard from '../components/MetricCard';
-import GaugeChart from '../components/GaugeChart';
-import ProgressBar from '../components/ProgressBar';
-import HarvestCard from '../components/HarvestCard';
-import { dashboardData } from '../data/mockData';
+import { mockDashboard } from '../data/mockData';
+
+const SCORE_BAR_DATA = [
+  { label: 'Excelente (90-100)', value: mockDashboard.distribuicaoScore.excelente, fill: '#2D5016' },
+  { label: 'Bom (70-89)', value: mockDashboard.distribuicaoScore.bom, fill: '#4A7C2F' },
+  { label: 'Regular (<70)', value: mockDashboard.distribuicaoScore.regular, fill: '#F59E0B' },
+];
 
 export default function Dashboard() {
-    const { metricasGerais, performanceGeral, indicadoresSustentabilidade, safrasParaPatrocinio } = dashboardData;
+  return (
+    <div className="space-y-8">
+      {/* Boas-vindas */}
+      <div>
+        <h1 className="text-2xl font-bold text-cred-gray-text">
+          Bem-vinda, <span className="text-cred-green-dark">Empresa Exemplo Ltda</span>
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Veja as safras disponíveis de produtores amazônicos verificados.
+        </p>
+      </div>
 
-    // Estados dos filtros
-    const [busca, setBusca] = useState('');
-    const [scoreMin, setScoreMin] = useState('');
-    const [ordenarPor, setOrdenarPor] = useState('validacao'); // 'validacao' ou 'score'
-
-    // Filtragem e ordenação automática (useMemo evita cálculos desnecessários)
-    const safrasFiltradas = useMemo(() => {
-        let resultado = [...safrasParaPatrocinio];
-
-        if (busca) {
-            const termo = busca.toLowerCase();
-            resultado = resultado.filter(s =>
-                s.produtor.toLowerCase().includes(termo) ||
-                s.safra.toLowerCase().includes(termo) ||
-                s.associacao.toLowerCase().includes(termo) ||
-                s.regiao.toLowerCase().includes(termo)
-            );
-        }
-
-        if (scoreMin) {
-            resultado = resultado.filter(s => s.agroScore >= Number(scoreMin));
-        }
-
-        resultado.sort((a, b) => {
-            return ordenarPor === 'score' ? b.agroScore - a.agroScore : b.validacaoEsg - a.validacaoEsg;
-        });
-
-        return resultado;
-    }, [safrasParaPatrocinio, busca, scoreMin, ordenarPor]);
-
-    return (
-        <div className="space-y-8">
-            {/* Métricas Gerais */}
-            <section>
-                <h2 className="text-2xl font-bold text-cred-green-dark mb-6">Métricas Gerais</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <MetricCard title="Safras Disponíveis" value={metricasGerais.safrasDisponiveis} subtitle="Aguardando patrocínio" icon={Leaf} colorScheme="green" />
-                    <MetricCard title="Área Total" value={`${metricasGerais.areaTotal}ha`} subtitle="Hectares disponíveis" icon={MapPin} colorScheme="orange" />
-                    <MetricCard title="Produtores Ativos" value={metricasGerais.produtoresAtivos} subtitle="Cadastrados" icon={Users} colorScheme="green" />
-                    <MetricCard title="AgroScore Médio" value={metricasGerais.agroScoreMedio} subtitle="Pontuação geral" icon={Plus} colorScheme="orange" />
-                </div>
-            </section>
-
-            {/* Performance & Indicadores */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <GaugeChart agroScore={performanceGeral.agroScore} sustentabilidade={performanceGeral.sustentabilidade} />
-
-                <div className="bg-cred-green-dark rounded-2xl p-6 text-white">
-                    <h3 className="text-lg font-semibold mb-6">Indicadores de Sustentabilidade</h3>
-                    <ProgressBar label="Práticas Sustentáveis" value={indicadoresSustentabilidade.praticasSustentaveis} colorScheme="orange" />
-                    <ProgressBar label="Qualidade da Produção" value={indicadoresSustentabilidade.qualidadeProducao} colorScheme="orange" />
-                    <ProgressBar label="Certificações" value={indicadoresSustentabilidade.certificacoes} colorScheme="orange" />
-
-                    <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
-                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.culturasOrganicas}</p><p className="text-xs opacity-75 mt-1">Culturas Orgânicas</p></div>
-                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.praticasRegenerativas}</p><p className="text-xs opacity-75 mt-1">Práticas Regenerativas</p></div>
-                        <div className="text-center"><p className="text-2xl font-bold text-white">{indicadoresSustentabilidade.usoEficienteAgua}%</p><p className="text-xs opacity-75 mt-1">Uso Eficiente de Água</p></div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Safras + Filtros */}
-            <section>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h2 className="text-2xl font-bold text-cred-green-dark">Safras para Patrocínio</h2>
-                        <p className="text-sm text-gray-600 mt-1">{safrasFiltradas.length} oportunidade{safrasFiltradas.length !== 1 ? 's' : ''} encontrada{safrasFiltradas.length !== 1 ? 's' : ''}</p>
-                    </div>
-
-                    {/* Barra de Filtros */}
-                    <div className="flex flex-wrap gap-3 bg-white p-3 rounded-xl border border-cred-beige shadow-sm">
-                        <div className="relative flex-1 min-w-[180px]">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Buscar produtor ou safra..."
-                                value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cred-orange/50"
-                            />
-                        </div>
-                        <select
-                            value={scoreMin}
-                            onChange={(e) => setScoreMin(e.target.value)}
-                            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cred-orange/50 bg-white"
-                        >
-                            <option value="">Score mínimo</option>
-                            <option value="80">≥ 80</option>
-                            <option value="85">≥ 85</option>
-                            <option value="90">≥ 90</option>
-                        </select>
-                        <select
-                            value={ordenarPor}
-                            onChange={(e) => setOrdenarPor(e.target.value)}
-                            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cred-orange/50 bg-white"
-                        >
-                            <option value="validação">Ordenar: Validação ESG</option>
-                            <option value="score">Ordenar: AgroScore</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Grid de Cards */}
-                {safrasFiltradas.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {safrasFiltradas.map((safra) => (
-                            <HarvestCard key={safra.id} safra={safra} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-12 bg-white rounded-2xl border border-cred-beige">
-                        <SlidersHorizontal className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500 font-medium">Nenhuma safra encontrada com esses filtros.</p>
-                        <button
-                            onClick={() => { setBusca(''); setScoreMin(''); }}
-                            className="mt-3 text-sm text-cred-orange hover:underline"
-                        >
-                            Limpar filtros
-                        </button>
-                    </div>
-                )}
-            </section>
+      {/* Métricas — 3 cards */}
+      <section>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <MetricCard
+            title="Safras Ativas"
+            value={mockDashboard.safrasAtivas}
+            subtitle="Em todo o sistema"
+            icon={Leaf}
+            colorScheme="green"
+          />
+          <MetricCard
+            title="Score Médio"
+            value={`${mockDashboard.agroScoreMedio}/100`}
+            subtitle="AgroScore médio das safras"
+            icon={Star}
+            colorScheme="green"
+          />
+          <MetricCard
+            title="Hectares Totais"
+            value={`${mockDashboard.areaTotalHectares.toLocaleString('pt-BR')} ha`}
+            subtitle="Área monitorada"
+            icon={MapPin}
+            colorScheme="orange"
+          />
         </div>
-    );
+      </section>
+
+      {/* Gráficos */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Bar Chart: Distribuição AgroScore */}
+        <div className="bg-white rounded-2xl p-6 border border-cred-gray-border shadow-sm">
+          <h2 className="text-base font-semibold text-cred-gray-text mb-1">
+            📊 Distribuição de AgroScore
+          </h2>
+          <p className="text-xs text-gray-400 mb-5">Quantidade de safras por faixa de pontuação</p>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={SCORE_BAR_DATA} barSize={48}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 11, fill: '#555' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: '#555' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                cursor={{ fill: '#F5F5F5' }}
+                contentStyle={{ borderRadius: 8, border: '1px solid #E0E0E0', fontSize: 13 }}
+                formatter={(v) => [`${v} safras`, 'Quantidade']}
+              />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {SCORE_BAR_DATA.map((entry, i) => (
+                  <Cell key={i} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Mapa placeholder */}
+        <div className="bg-white rounded-2xl p-6 border border-cred-gray-border shadow-sm">
+          <h2 className="text-base font-semibold text-cred-gray-text mb-1">
+            🗺️ Regiões com Safras Disponíveis
+          </h2>
+          <p className="text-xs text-gray-400 mb-5">Distribuição geográfica das associações</p>
+          <div className="h-[200px] bg-cred-gray-neutral rounded-xl flex flex-col items-center justify-center gap-3 border-2 border-dashed border-cred-gray-border">
+            <span className="text-4xl">🗺️</span>
+            <p className="text-sm text-gray-400 font-medium">Mapa interativo em desenvolvimento</p>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-cred-gray-border">
+              <span className="w-2 h-2 rounded-full bg-cred-green-medium" />
+              <span className="text-xs text-gray-500">Moju-PA · 127 safras</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Atalho para catálogo */}
+      <section className="bg-cred-green-dark rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold">Explore o Catálogo de Safras</h2>
+          <p className="text-sm text-white/75 mt-1">
+            Veja todas as safras disponíveis, filtre por produto, AgroScore e região.
+          </p>
+        </div>
+        <a
+          href="/safras"
+          className="px-6 py-2.5 bg-white text-cred-green-dark font-semibold rounded-lg hover:bg-cred-beige transition-colors text-sm whitespace-nowrap"
+        >
+          Ver Catálogo →
+        </a>
+      </section>
+    </div>
+  );
 }
